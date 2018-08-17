@@ -5,17 +5,17 @@
       "question": "Why did the chicken cross the road?",
       "answers": [
         {
-          "answer_id": "a_1",
+          "answer_id": "a1",
           "answer": "Because because because",
           "votes": 3
         },
         {
-          "answer_id": "a_2",
+          "answer_id": "a2",
           "answer": "To get to the other side",
           "votes": 3
         },
         {
-          "answer_id": "a_3",
+          "answer_id": "a3",
           "answer": "Chicken? What chicken?",
           "votes": 3
         }
@@ -49,6 +49,16 @@
     {
       "question_id": 7,
       "question": "blahblahblah",
+      "answers": []
+    },
+    {
+      "question_id": 8,
+      "question": "How far away is the moon?",
+      "answers": []
+    },
+    {
+      "question_id": 9,
+      "question": "What is my question?",
       "answers": []
     }
   ]
