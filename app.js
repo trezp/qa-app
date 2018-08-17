@@ -4,25 +4,30 @@ const fs = require('fs');
 const data = require('./data.json');
 
 
-app.get('/', (req, res) => res.json(data.questions));
+app.get('/questions', (req, res) => res.json(data.questions));
 
-app.get('/questions/:id', (req,res) => {
-  const question = data.questions.filter((result) =>{
-    if (req.params.id == result.question_id) {
-        return result.question
+app.get('/questions/:qID', (req,res) => {
+  data.questions.forEach((question) =>{
+    if (req.params.qID == question.question_id) {
+        res.send(question)
     } 
   });
-
-  res.json(question);
 }); 
 
-app.get('/questions/:id/answers', (req,res) => {
-  const answers = data.questions.filter((result) =>{
-    if (req.params.id == result.question_id) {
-        return result.answers
+app.get('/questions/:qID/answers', (req,res) => {
+  data.questions.forEach((question) =>{
+    if (req.params.qID == question.question_id) {
+      res.send(question.answers)
     } 
   });
-  res.json(answers);
+}); 
+
+app.get('/questions/:qID/answers/:aID', (req,res) => {
+  data.questions.forEach((question) =>{
+    if (req.params.qID == question.question_id) {
+      res.send(question.answers)
+    } 
+  });
 }); 
 
 app.post('/questions', (req,res) => {
