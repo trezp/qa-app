@@ -10,7 +10,7 @@ app.use(bodyParser.json({ type: 'application/json' }));
 
 app.get('/questions', (req, res) => res.json(data.questions));
 
-app.get('/questions/:qID', (req,res) => {
+app.get('/questions/:qID', (req, res) => {
   data.questions.forEach((question) =>{
     if (req.params.qID == question.question_id) {
       res.json(question)
@@ -18,7 +18,7 @@ app.get('/questions/:qID', (req,res) => {
   });
 }); 
 
-app.get('/questions/:qID/answers', (req,res) => {
+app.get('/questions/:qID/answers', (req, res) => {
   data.questions.forEach((question) =>{
     if (req.params.qID == question.question_id) {
       res.json(question.answers)
@@ -26,7 +26,7 @@ app.get('/questions/:qID/answers', (req,res) => {
   });
 }); 
 
-app.get('/questions/:qID/answers/:aID', (req,res) => {
+app.get('/questions/:qID/answers/:aID', (req, res) => {
   data.questions.forEach((question) =>{
     if (req.params.qID == question.question_id) {
       question.answers.forEach( (answer) => {
@@ -38,9 +38,27 @@ app.get('/questions/:qID/answers/:aID', (req,res) => {
   });
 }); 
 
-app.post('/questions', (req,res) => {
-  data.questions.push(req.body);
-  console.log(req.body)
+app.post('/questions', (req, res) => {
+  
+  data.questions.push({
+    "question_id": data.questions.length, 
+    "question": req.body.question,
+    "answers": []
+  });
+
+  fs.writeFile('data.json', JSON.stringify(data, null, 2));
+  res.json(data);
+});
+
+app.post('/questions/:qID', ( req, res ) => {
+  const questionID = req.params.qID;
+  console.log(data.questions.length)
+
+  data.questions[questionID].answers.push({
+    "answer_id": `a${data.questions[questionID].answers.length}`, 
+    "answer": req.body.answer,
+    "votes": 0
+  });
 
   fs.writeFile('data.json', JSON.stringify(data, null, 2));
   res.json(data);

@@ -1,65 +1,41 @@
 {
   "questions": [
     {
-      "question_id": 1,
-      "question": "Why did the chicken cross the road?",
+      "question_id": 0,
+      "question": "If you could have any super power, what would it be?",
       "answers": [
         {
+          "answer_id": "a0",
+          "answer": "I would be invisible!",
+          "votes": 0
+        },
+        {
           "answer_id": "a1",
-          "answer": "Because because because",
-          "votes": 3
+          "answer": "I would be able to fly!",
+          "votes": 0
         },
         {
           "answer_id": "a2",
-          "answer": "To get to the other side",
-          "votes": 3
-        },
-        {
-          "answer_id": "a3",
-          "answer": "Chicken? What chicken?",
-          "votes": 3
+          "answer": "I would be incredibly rich.",
+          "votes": 0
         }
       ]
     },
     {
       "question_id": 2,
-      "question": "Why did the chicken cross the road?",
-      "answers": []
-    },
-    {
-      "question_id": 3,
-      "question": "Why did the chicken cross the road?",
-      "answers": []
-    },
-    {
-      "question_id": 4,
-      "question": "This is a new question",
-      "answers": []
-    },
-    {
-      "question_id": 5,
-      "question": "This is a new question",
-      "answers": []
-    },
-    {
-      "question_id": 6,
-      "question": "This is a new question",
-      "answers": []
-    },
-    {
-      "question_id": 7,
-      "question": "blahblahblah",
-      "answers": []
-    },
-    {
-      "question_id": 8,
-      "question": "How far away is the moon?",
-      "answers": []
-    },
-    {
-      "question_id": 9,
-      "question": "What is my question?",
-      "answers": []
+      "question": "How many dinosaurs does it take to get to the moon?",
+      "answers": [
+        {
+          "answer_id": "a0",
+          "answer": "3000 dinosaurs",
+          "votes": 0
+        },
+        {
+          "answer_id": "a1",
+          "answer": "So many dinosaurs",
+          "votes": 0
+        }
+      ]
     }
   ]
 }
