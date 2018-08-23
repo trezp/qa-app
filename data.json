@@ -2,37 +2,32 @@
   "questions": [
     {
       "question_id": 0,
-      "question": "If you could have any super power, what would it be?",
+      "question": "Who is your favorite supernatural character?",
       "answers": [
         {
           "answer_id": "a0",
-          "answer": "I would be invisible!",
+          "answer": "Both Sam and Dean of course!",
           "votes": 0
         },
         {
           "answer_id": "a1",
-          "answer": "I would be able to fly!",
-          "votes": 0
-        },
-        {
-          "answer_id": "a2",
-          "answer": "I would be incredibly rich.",
+          "answer": "Crowley and his mother.",
           "votes": 0
         }
       ]
     },
     {
-      "question_id": 2,
-      "question": "How many dinosaurs does it take to get to the moon?",
+      "question_id": 1,
+      "question": "Who is the best Doctor?",
       "answers": [
         {
           "answer_id": "a0",
-          "answer": "3000 dinosaurs",
+          "answer": "Eleven!",
           "votes": 0
         },
         {
           "answer_id": "a1",
-          "answer": "So many dinosaurs",
+          "answer": "The best doctor is yet to come!",
           "votes": 0
         }
       ]
