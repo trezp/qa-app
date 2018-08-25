@@ -2,32 +2,32 @@
   "questions": [
     {
       "question_id": 0,
-      "question": "Who is your favorite supernatural character?",
+      "question": "Test question",
       "answers": [
         {
           "answer_id": "a0",
-          "answer": "Both Sam and Dean of course!",
-          "votes": 0
-        },
-        {
-          "answer_id": "a1",
-          "answer": "Crowley and his mother.",
-          "votes": 0
+          "answer": "My favorite color is blue.",
+          "votes": 5
         }
       ]
     },
     {
       "question_id": 1,
-      "question": "Who is the best Doctor?",
+      "question": "Why is the sky blue?",
+      "answers": []
+    },
+    {
+      "question_id": 2,
+      "question": "What is your favorite color?",
       "answers": [
         {
           "answer_id": "a0",
-          "answer": "Eleven!",
+          "answer": "My favorite color is blue.",
           "votes": 0
         },
         {
           "answer_id": "a1",
-          "answer": "The best doctor is yet to come!",
+          "answer": "My favorite color is purple.",
           "votes": 0
         }
       ]
