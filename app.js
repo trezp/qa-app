@@ -48,15 +48,21 @@ app.get('/questions/:qID', (req, res) => {
 app.post('/questions/:qID', ( req, res ) => {
   const question = getQuestion(req.params.qID);
 
-  question.answers.push({
-    "answer_id": `a${question.answers.length}`, 
-    "answer": req.body.answer,
-    "votes": 0
-  });
-
-  fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
-    res.json(data);
-  });
+  if(req.body.answer){
+    question.answers.push({
+      "answer_id": `a${question.answers.length}`, 
+      "answer": req.body.answer,
+      "votes": 0
+    });
+  
+    fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
+      res.json(data);
+    });
+  } else {
+    res.status(404).json({
+      error: "Oops! You must provide an answer."
+    });
+  }
 });
 
 // Vote up an answer up
@@ -87,13 +93,72 @@ app.post('/questions/:qID/answers/:aID/vote-down', (req, res) => {
   }
 });
 
-// DELETE questions (for testing only)
+// EDIT A QUESTION
+app.put('/questions/:qID', (req, res) => {
+  const question = getQuestion(req.params.qID);
+
+  if(question){
+    question.question = req.body.question;
+
+    fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
+      res.json(data);
+    });
+  } else {
+    res.json(data);
+  }
+});
+
+//EDIT AN ANSWER
+
+app.put('/questions/:qID/answers/:aID', (req, res) => {
+  const answer = getAnswer(req.params.qID, req.params.aID);
+
+  if(answer){
+   answer.answer = req.body.answer;
+
+    fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
+      res.json(data);
+    });
+  } else {
+    res.json(data);
+  }
+});
+
+//DELETE A QUESTION 
+
+app.delete('/questions/:qID', (req, res) => {
+
+  data.questions = data.questions.filter(question => {
+    return question.question_id != req.params.qID
+  });
+
+  fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
+    res.json(data);
+  });
+});
+
+// DELETE AN ANSWER 
+app.delete('/questions/:qID/answers/:aID', (req, res) => {
+  const question = getQuestion(req.params.qID);
+
+  question.answers = question.answers.filter(answer => {
+    return answer.answer_id != req.params.aID
+  });
+
+  fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
+    res.json(data);
+  });
+});
+
+// DELETE everything (for testing only)
 app.get('/remove', (req, res) => {
   data.questions = [];
   fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
     res.json(data);
   });
 }); 
+
+
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
 
@@ -105,7 +170,7 @@ function getQuestion(id){
   });
 }
 
-function getAnswer( qID, aID){
+function getAnswer(qID, aID){
   return getQuestion(qID).answers.find( answer => {
     return answer["answer_id"] == aID;
   });
@@ -113,8 +178,4 @@ function getAnswer( qID, aID){
 
 //TO DO 
 // Error handling for routes that don't exist 
-// If voting occurs to quickly server doesn't respond
-// delete a question
-// delete an answer
-// edit a question
-// edit an answer
+// When editing, should probably make existing info available

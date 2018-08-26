@@ -1,33 +1,38 @@
 {
   "questions": [
     {
-      "question_id": 0,
-      "question": "Test question",
-      "answers": [
-        {
-          "answer_id": "a0",
-          "answer": "My favorite color is blue.",
-          "votes": 5
-        }
-      ]
-    },
-    {
       "question_id": 1,
-      "question": "Why is the sky blue?",
-      "answers": []
-    },
-    {
-      "question_id": 2,
-      "question": "What is your favorite color?",
+      "question": "What do unicorns eat?",
       "answers": [
         {
           "answer_id": "a0",
-          "answer": "My favorite color is blue.",
+          "answer": "Hamburgers",
           "votes": 0
         },
         {
           "answer_id": "a1",
-          "answer": "My favorite color is purple.",
+          "answer": "Ice cream with sprinkles",
+          "votes": 0
+        }
+      ]
+    },
+    {
+      "question_id": 2,
+      "question": "Who is the 50th president of the United States?",
+      "answers": [
+        {
+          "answer_id": "a0",
+          "answer": "There is no 50th president.",
+          "votes": 0
+        },
+        {
+          "answer_id": "a1",
+          "answer": "Brad Pitt",
+          "votes": 0
+        },
+        {
+          "answer_id": "a3",
+          "answer": "No one",
           "votes": 0
         }
       ]
