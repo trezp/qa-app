@@ -15,7 +15,7 @@ app.post('/questions', (req, res, err) => {
   
   if(req.body.question){
     data.questions.push({
-      "question_id": data.questions.length, 
+      "question_id": generateRandomID('q'), 
       "question": req.body.question,
       "answers": []
     });
@@ -23,9 +23,9 @@ app.post('/questions', (req, res, err) => {
     fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
       res.json(data);
     });
-
-  } else {
-    res.status(400).json({error: "Oops! You must ask a question!"});
+  } 
+  else {
+    res.status(400).json({error: "Expecting a question."});
   }
   
 });
@@ -33,7 +33,7 @@ app.post('/questions', (req, res, err) => {
 // GET specific question
 app.get('/questions/:qID', (req, res) => {
   const question = getQuestion(req.params.qID);
-  
+
   if (question){
     res.json(question);
   } else {
@@ -50,7 +50,7 @@ app.post('/questions/:qID', ( req, res ) => {
 
   if(req.body.answer){
     question.answers.push({
-      "answer_id": `a${question.answers.length}`, 
+      "answer_id": generateRandomID('a'), 
       "answer": req.body.answer,
       "votes": 0
     });
@@ -92,6 +92,9 @@ app.post('/questions/:qID/answers/:aID/vote-down', (req, res) => {
     res.status(404).json({error: "Answer not found"});
   }
 });
+
+// James: We don't cover editing or deleting a question or answer in the course, but I did 
+// it anyway just for funsies. I don't know if we want to go this far in the course.
 
 // EDIT A QUESTION
 app.put('/questions/:qID', (req, res) => {
@@ -158,7 +161,20 @@ app.get('/remove', (req, res) => {
   });
 }); 
 
+app.use(function(req, res, next){
+  const err = new Error("Not Found");
+  err.status = 404;
+  next(err);
+});
 
+app.use(function(err, req, res, next){
+  res.status(err.status || 500);
+  res.json({
+    error: {
+      message: err.message
+    }
+  })
+});
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
 
@@ -176,6 +192,7 @@ function getAnswer(qID, aID){
   });
 }
 
-//TO DO 
-// Error handling for routes that don't exist 
-// When editing, should probably make existing info available
+function generateRandomID(type){
+  return `${type + Math.floor(Math.random() * 10000)}`;
+}
+
