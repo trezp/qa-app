@@ -1,33 +1,23 @@
 {
   "questions": [
     {
-      "question_id": "q541",
-      "questionBody": "HEY HEY HEY",
+      "question_id": 9545,
+      "questionBody": "Why is the sky blue?",
       "answers": []
     },
     {
-      "question_id": "q777",
-      "questionBody": "HEY HEY HEY",
+      "question_id": 2998,
+      "questionBody": "What is the answer to life, the universe and everything?",
       "answers": []
     },
     {
-      "question_id": "q6419",
-      "questionBody": "HEY HEY HEY",
+      "question_id": 2095,
+      "questionBody": "What is the answer to life, the universe and everything?",
       "answers": []
     },
     {
-      "question_id": "q8667",
-      "questionBody": "HEY HEY HEY",
-      "answers": []
-    },
-    {
-      "question_id": "q3640",
-      "questionBody": "HEY HEY HEY",
-      "answers": []
-    },
-    {
-      "question_id": "q4288",
-      "questionBody": "Yet another question",
+      "question_id": 8244,
+      "questionBody": "A new question",
       "answers": []
     }
   ]

@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const data = require('./data.json');
-const orm = require('./helpers');
+const records = require('./records');
 
 const app = express();
 
@@ -12,30 +12,29 @@ app.get('/questions', (req, res) => res.json(data.questions));
 
 // POST Create a new question
 app.post('/questions', (req, res) => {
-  
-  if(req.body.question){
-    orm.createNewQuestion(req.body.question, function(question){
-      orm.save(function(){
-        res.json(question);
-      });
-    });
-  } else {
+
+  if(!req.body.question){
     res.status(404).json({error: "Expecting a question."});
+  } else {
+    records.createNewQuestion(req.body.question, (question) => {
+      res.status(201).json(question);
+    });
   }
-  
+
 });
 
 // GET specific question
 app.get('/questions/:qID', (req, res) => {
-  const question = getQuestion(req.params.qID);
 
-  if (question){
-    res.json(question);
-  } else {
-    res.status(404).json({
-      error: "Question not found"
-    });
-  }
+  records.fetchQuestion(req.params.qID, (question) => {
+    if (!question){
+      res.status(400).json({
+        error: "Question not found"
+      });
+    } else {
+      res.json(question);
+    }
+  });
   
 }); 
 
