@@ -1,7 +1,7 @@
 const express = require('express');
-const fs = require('fs');
 const bodyParser = require('body-parser')
 const data = require('./data.json');
+const orm = require('./helpers');
 
 const app = express();
 
@@ -11,21 +11,16 @@ app.use(bodyParser.json({ type: 'application/json' }));
 app.get('/questions', (req, res) => res.json(data.questions));
 
 // POST Create a new question
-app.post('/questions', (req, res, err) => {
+app.post('/questions', (req, res) => {
   
   if(req.body.question){
-    data.questions.push({
-      "question_id": generateRandomID('q'), 
-      "question": req.body.question,
-      "answers": []
+    orm.createNewQuestion(req.body.question, function(question){
+      orm.save(function(){
+        res.json(question);
+      });
     });
-
-    fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
-      res.json(data);
-    });
-  } 
-  else {
-    res.status(400).json({error: "Expecting a question."});
+  } else {
+    res.status(404).json({error: "Expecting a question."});
   }
   
 });
@@ -179,20 +174,4 @@ app.use(function(err, req, res, next){
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
 
 
-////    HELPER FUNCTIONS  ////
-function getQuestion(id){
-  return data.questions.find(question => {
-    return question["question_id"] == id
-  });
-}
-
-function getAnswer(qID, aID){
-  return getQuestion(qID).answers.find( answer => {
-    return answer["answer_id"] == aID;
-  });
-}
-
-function generateRandomID(type){
-  return `${type + Math.floor(Math.random() * 10000)}`;
-}
 

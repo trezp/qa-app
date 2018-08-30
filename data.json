@@ -1,57 +1,34 @@
 {
   "questions": [
     {
-      "question_id": "q4641",
-      "question": "Why is a raven like a writing desk?",
-      "answers": [
-        {
-          "answer_id": "a835",
-          "answer": "Huh?",
-          "votes": 0
-        },
-        {
-          "answer_id": "a7384",
-          "answer": "Yes.",
-          "votes": 3
-        }
-      ]
-    },
-    {
-      "question_id": "q550",
-      "question": "What is the answer to life, the universe and everything?",
-      "answers": [
-        {
-          "answer_id": "a3627",
-          "answer": "Why of course it's 42.",
-          "votes": 0
-        },
-        {
-          "answer_id": "a5140",
-          "answer": "Yes.",
-          "votes": 0
-        }
-      ]
-    },
-    {
-      "question_id": "q4295",
-      "question": "Which came first, the chicken or the egg?",
+      "question_id": "q541",
+      "questionBody": "HEY HEY HEY",
       "answers": []
     },
     {
-      "question_id": "q9180",
-      "question": "Why is the sky blue?",
-      "answers": [
-        {
-          "answer_id": "a615",
-          "answer": "I live in Oregon, the sky is gray.",
-          "votes": 0
-        },
-        {
-          "answer_id": "a4334",
-          "answer": "The sky reflects blue.",
-          "votes": 0
-        }
-      ]
+      "question_id": "q777",
+      "questionBody": "HEY HEY HEY",
+      "answers": []
+    },
+    {
+      "question_id": "q6419",
+      "questionBody": "HEY HEY HEY",
+      "answers": []
+    },
+    {
+      "question_id": "q8667",
+      "questionBody": "HEY HEY HEY",
+      "answers": []
+    },
+    {
+      "question_id": "q3640",
+      "questionBody": "HEY HEY HEY",
+      "answers": []
+    },
+    {
+      "question_id": "q4288",
+      "questionBody": "Yet another question",
+      "answers": []
     }
   ]
 }
