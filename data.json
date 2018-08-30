@@ -1,24 +1,3 @@
 {
-  "questions": [
-    {
-      "question_id": 9545,
-      "questionBody": "Why is the sky blue?",
-      "answers": []
-    },
-    {
-      "question_id": 2998,
-      "questionBody": "What is the answer to life, the universe and everything?",
-      "answers": []
-    },
-    {
-      "question_id": 2095,
-      "questionBody": "What is the answer to life, the universe and everything?",
-      "answers": []
-    },
-    {
-      "question_id": 8244,
-      "questionBody": "A new question",
-      "answers": []
-    }
-  ]
+  "questions": []
 }

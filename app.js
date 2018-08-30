@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser')
 const data = require('./data.json');
 const records = require('./records');
+const fs = require('fs');
 
 const app = express();
 
@@ -12,7 +13,6 @@ app.get('/questions', (req, res) => res.json(data.questions));
 
 // POST Create a new question
 app.post('/questions', (req, res) => {
-
   if(!req.body.question){
     res.status(404).json({error: "Expecting a question."});
   } else {
@@ -20,12 +20,10 @@ app.post('/questions', (req, res) => {
       res.status(201).json(question);
     });
   }
-
 });
 
 // GET specific question
 app.get('/questions/:qID', (req, res) => {
-
   records.fetchQuestion(req.params.qID, (question) => {
     if (!question){
       res.status(400).json({
@@ -35,28 +33,21 @@ app.get('/questions/:qID', (req, res) => {
       res.json(question);
     }
   });
-  
 }); 
 
 // POST a new answer
 app.post('/questions/:qID', ( req, res ) => {
-  const question = getQuestion(req.params.qID);
 
-  if(req.body.answer){
-    question.answers.push({
-      "answer_id": generateRandomID('a'), 
-      "answer": req.body.answer,
-      "votes": 0
-    });
-  
-    fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
-      res.json(data);
-    });
-  } else {
+  if (!req.body.answer){
     res.status(404).json({
       error: "Oops! You must provide an answer."
     });
+  } else {
+    records.createNewAnswer(req.params.qID, req.body.answer, (question) =>{
+      res.status(201).json(question);
+    });
   }
+
 });
 
 // Vote up an answer up
@@ -150,9 +141,8 @@ app.delete('/questions/:qID/answers/:aID', (req, res) => {
 // DELETE everything (for testing only)
 app.get('/remove', (req, res) => {
   data.questions = [];
-  fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
-    res.json(data);
-  });
+  fs.writeFile('data.json', JSON.stringify(data, null, 2));
+  res.end();
 }); 
 
 app.use(function(req, res, next){
