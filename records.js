@@ -1,8 +1,8 @@
 const fs = require('fs');
 const data = require('./data.json');
 
-exports.save = () => {
-  fs.writeFile('data.json', JSON.stringify(data, null, 2));
+exports.save = (cb) => {
+  fs.writeFile('data.json', JSON.stringify(data, null, 2), cb);
 }
 
 exports.fetchQuestion = (id, cb) => {
@@ -10,8 +10,11 @@ exports.fetchQuestion = (id, cb) => {
   return cb(question);
 }
 
-exports.fetchAnswer = (qID, aID) => {
-  return modules.exports.fetchQuestion(qID, (question) => question.answers.answer_id);
+exports.fetchAnswer = (qID, aID, cb) => {
+  const answer = module.exports.fetchQuestion(qID, (question) => {
+    return question.answers.find(answer => answer.answer_id == aID);  
+  });
+  return cb(answer);
 }
 
 exports.createNewQuestion = (body, cb) => {
@@ -21,7 +24,6 @@ exports.createNewQuestion = (body, cb) => {
     answers: []
   }
   data.questions.push(question);
-  module.exports.save();
   return cb(question);
 }
 
@@ -34,9 +36,16 @@ exports.createNewAnswer = (id, body, cb) => {
 
   module.exports.fetchQuestion(id, (question)=> {
     question.answers.push(answer);
-    module.exports.save();
     return cb(question);
   });
+}
+
+exports.update = (id, body, cb) => {
+  const question = module.exports.fetchQuestion(id, (question) => {
+    question.questionBody = body;
+    return question
+  });
+  return cb(question);
 }
 
 exports.generateRandomId = () => {

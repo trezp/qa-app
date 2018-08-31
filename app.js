@@ -1,8 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser')
+const fs = require('fs');
+
 const data = require('./data.json');
 const records = require('./records');
-const fs = require('fs');
 
 const app = express();
 
@@ -17,7 +18,7 @@ app.post('/questions', (req, res) => {
     res.status(404).json({error: "Expecting a question."});
   } else {
     records.createNewQuestion(req.body.question, (question) => {
-      res.status(201).json(question);
+      records.save(()=> res.status(201).json(question));
     });
   }
 });
@@ -37,63 +38,46 @@ app.get('/questions/:qID', (req, res) => {
 
 // POST a new answer
 app.post('/questions/:qID', ( req, res ) => {
-
   if (!req.body.answer){
-    res.status(404).json({
+    res.status(400).json({
       error: "Oops! You must provide an answer."
     });
   } else {
     records.createNewAnswer(req.params.qID, req.body.answer, (question) =>{
-      res.status(201).json(question);
+      records.save(() => res.status(201).json(question));
     });
   }
-
 });
 
 // Vote up an answer up
 app.post('/questions/:qID/answers/:aID/vote-up', (req, res) => {
-  const answer = getAnswer(req.params.qID, req.params.aID);
-
-  if (answer){
-    answer.votes += 1
-    fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
-      res.json(data);
-    });
-  } else {
-    res.status(404).json({error: "Answer not found"});
-  }
+  records.fetchAnswer(req.params.qID, req.params.aID, (answer) => {
+    if (!answer){
+      res.status(400).json({error: "Answer not found"});
+    } else {
+      answer.votes += 1 // should this logic be elsewhere?
+      records.save(() => res.status(204).json({}));
+    }
+  });
 });
 
 // Vote an answer down 
 app.post('/questions/:qID/answers/:aID/vote-down', (req, res) => {
-  const answer = getAnswer(req.params.qID, req.params.aID);
-  
-  if (answer){
-    answer.votes -= 1
-    fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
-      res.json(data);
-    });
-  } else {
-    res.status(404).json({error: "Answer not found"});
-  }
+  records.fetchAnswer(req.params.qID, req.params.aID, (answer) => {
+    if (!answer){
+      res.status(400).json({error: "Answer not found"});
+    } else {
+      answer.votes -= 1;
+      records.save(() => res.status(204).json({}));
+    }
+  });
 });
-
-// James: We don't cover editing or deleting a question or answer in the course, but I did 
-// it anyway just for funsies. I don't know if we want to go this far in the course.
 
 // EDIT A QUESTION
 app.put('/questions/:qID', (req, res) => {
-  const question = getQuestion(req.params.qID);
-
-  if(question){
-    question.question = req.body.question;
-
-    fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
-      res.json(data);
-    });
-  } else {
-    res.json(data);
-  }
+  records.update(req.params.qID, req.body, (question) => {
+    records.save(() => res.status(201).json(question));
+  });
 });
 
 //EDIT AN ANSWER
