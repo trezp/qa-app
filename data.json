@@ -1,22 +1,3 @@
 {
-  "questions": [
-    {
-      "question_id": 1476,
-      "questionBody": {
-        "question": "Why is a raven like a writing desk??????"
-      },
-      "answers": [
-        {
-          "answer_id": 499,
-          "answerBody": "Does not compute.",
-          "votes": 3
-        }
-      ]
-    },
-    {
-      "question_id": 3477,
-      "questionBody": "Why is the sky blue?",
-      "answers": []
-    }
-  ]
+  "questions": []
 }

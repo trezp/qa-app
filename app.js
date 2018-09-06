@@ -17,8 +17,8 @@ app.post('/questions', (req, res) => {
   if(!req.body.question){
     res.status(404).json({error: "Expecting a question."});
   } else {
-    records.createNewQuestion(req.body.question, (question) => {
-      records.save(()=> res.status(201).json(question));
+    records.create(req.body.question, null, (question) => {
+      records.save( ()=> res.status(201).json(question));
     });
   }
 });
@@ -43,8 +43,8 @@ app.post('/questions/:qID', ( req, res ) => {
       error: "Oops! You must provide an answer."
     });
   } else {
-    records.createNewAnswer(req.params.qID, req.body.answer, (question) =>{
-      records.save(() => res.status(201).json(question));
+    records.create(req.body.answer, req.params.qID, (question) => {
+      records.save( () => {res.status(201).json(question)});
     });
   }
 });
@@ -55,7 +55,7 @@ app.post('/questions/:qID/answers/:aID/vote-up', (req, res) => {
     if (!answer){
       res.status(400).json({error: "Answer not found"});
     } else {
-      answer.votes += 1 // should this logic be elsewhere?
+      answer.votes += 1
       records.save(() => res.status(204).json({}));
     }
   });
@@ -75,50 +75,39 @@ app.post('/questions/:qID/answers/:aID/vote-down', (req, res) => {
 
 // EDIT A QUESTION
 app.put('/questions/:qID', (req, res) => {
-  records.update(req.params.qID, req.body, (question) => {
-    records.save(() => res.status(201).json(question));
+  records.update(req.params.qID, null, req.body, () => {
+    if (!req.body) {
+      res.status(400).json({error: "Question not found"});
+    } else {
+      records.save(() => res.status(201).json({}));
+    }
   });
 });
 
 //EDIT AN ANSWER
 
 app.put('/questions/:qID/answers/:aID', (req, res) => {
-  const answer = getAnswer(req.params.qID, req.params.aID);
-
-  if(answer){
-   answer.answer = req.body.answer;
-
-    fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
-      res.json(data);
-    });
-  } else {
-    res.json(data);
-  }
+  records.update(req.params.qID, req.params.aID, req.body, () => {
+    if (!req.body) {
+      res.status(400).json({error: "Question not found"});
+    } else {
+      records.save(() => res.status(201).json({}));
+    }
+  });
 });
 
 //DELETE A QUESTION 
 
 app.delete('/questions/:qID', (req, res) => {
-
-  data.questions = data.questions.filter(question => {
-    return question.question_id != req.params.qID
-  });
-
-  fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
-    res.json(data);
+  records.delete(req.params.qID, null, () => {
+    records.save(()=> res.status(201).json({}));
   });
 });
 
 // DELETE AN ANSWER 
 app.delete('/questions/:qID/answers/:aID', (req, res) => {
-  const question = getQuestion(req.params.qID);
-
-  question.answers = question.answers.filter(answer => {
-    return answer.answer_id != req.params.aID
-  });
-
-  fs.writeFile('data.json', JSON.stringify(data, null, 2), ()=>{
-    res.json(data);
+  records.delete(req.params.qID, req.params.aID, ()=> {
+    records.save(() => res.status(201).json({}));
   });
 });
 

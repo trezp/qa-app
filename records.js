@@ -17,35 +17,57 @@ exports.fetchAnswer = (qID, aID, cb) => {
   return cb(answer);
 }
 
-exports.createNewQuestion = (body, cb) => {
-  const question = {
-    question_id: module.exports.generateRandomId(),
-    questionBody: body, 
-    answers: []
-  }
-  data.questions.push(question);
-  return cb(question);
-}
+exports.create = (body, id, cb) => {
 
-exports.createNewAnswer = (id, body, cb) => {
-  const answer = {
-    answer_id: module.exports.generateRandomId(),
-    answerBody: body, 
-    votes: 0
-  }
-
-  module.exports.fetchQuestion(id, (question)=> {
-    question.answers.push(answer);
+  if (!id) {
+    const question = {
+      question_id: module.exports.generateRandomId(),
+      question: body, 
+      answers: []
+    }
+    data.questions.push(question);
     return cb(question);
-  });
+  } else {
+    const answer = {
+      answer_id: module.exports.generateRandomId(),
+      answer: body, 
+      votes: 0
+    }
+  
+    module.exports.fetchQuestion(id, (question)=> {
+      question.answers.push(answer);
+      return cb(question);
+    });
+  }
+
 }
 
-exports.update = (id, body, cb) => {
-  const question = module.exports.fetchQuestion(id, (question) => {
-    question.questionBody = body;
-    return question
+exports.update = (qID, aID, body, cb) => {
+
+  if (!aID) {
+    module.exports.fetchQuestion(qID, (question) => {
+      question.question = body.question;
+    });
+  } else {
+    module.exports.fetchAnswer(qID, aID, (answer) => {
+      console.log(answer)
+      answer.answer = body.answer;
+    });
+  }
+  return cb();
+}
+
+exports.delete = (qID, aID, cb) => {
+  module.exports.fetchQuestion(qID, (question) => {
+    if (question){
+      if (!aID) {
+        data.questions = data.questions.filter(question => question.question_id != qID);
+      } else {
+        question.answers = question.answers.filter(answer => answer.answer_id != aID);
+      }
+    } 
+    return cb();
   });
-  return cb(question);
 }
 
 exports.generateRandomId = () => {
@@ -54,5 +76,4 @@ exports.generateRandomId = () => {
 
 //TO DO
 // Location header
-// vote up/down
-// Edit/delete
+// Throw error if deleted question/answer does not exist
