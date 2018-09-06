@@ -1,3 +1,46 @@
 {
-  "questions": []
+  "questions": [
+    {
+      "question_id": 9636,
+      "question": "What is the answer to life, the universe, and everything?",
+      "answers": [
+        {
+          "answer_id": 246,
+          "answer": "42",
+          "votes": 0
+        },
+        {
+          "answer_id": 7779,
+          "answer": "A life well lived.",
+          "votes": 0
+        }
+      ]
+    },
+    {
+      "question_id": 5875,
+      "question": "What's your favorite programming language?",
+      "answers": []
+    },
+    {
+      "question_id": 7336,
+      "question": "JavaScript or Python?",
+      "answers": [
+        {
+          "answer_id": 7146,
+          "answer": "Both are quite useful.",
+          "votes": 0
+        },
+        {
+          "answer_id": 7800,
+          "answer": "JavaScript!",
+          "votes": 0
+        },
+        {
+          "answer_id": 2651,
+          "answer": "Python!",
+          "votes": 0
+        }
+      ]
+    }
+  ]
 }
