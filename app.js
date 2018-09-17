@@ -34,7 +34,7 @@ app.post('/questions', async (req, res, next) => {
 
 // POST a new answer
 app.post('/questions/:qID/answers', async (req, res, next) => {
-  const question = await records.getQuestion(req.params.qID);
+  const question = records.getQuestion(req.params.qID);
 
   // I need to make sure that the question exists AND that they've provided an answer
   // What should I expect from the client? Just the answer body, or an object?
@@ -52,8 +52,8 @@ app.post('/questions/:qID/answers', async (req, res, next) => {
 });
 
 // Vote up an answer up
-app.post('/questions/:qID/answers/:aID/vote-up', async (req, res) => {
-  const answer = await records.getAnswer(req.params.qID, req.params.aID);
+app.post('/questions/:qID/answers/:aID/vote-up', async (req, res, next) => {
+  const answer = records.getAnswer(req.params.qID, req.params.aID);
 
   if(!answer){
     res.status(404).json({error: "Answer not found"});
@@ -68,8 +68,8 @@ app.post('/questions/:qID/answers/:aID/vote-up', async (req, res) => {
 });
 
 // Vote an answer down 
-app.post('/questions/:qID/answers/:aID/vote-down', async (req, res) => {
-  const answer = await records.getAnswer(req.params.qID, req.params.aID);
+app.post('/questions/:qID/answers/:aID/vote-down', async (req, res, next) => {
+  const answer = records.getAnswer(req.params.qID, req.params.aID);
 
   if(!answer){
     res.status(404).json({error: "Answer not found"});
@@ -84,63 +84,68 @@ app.post('/questions/:qID/answers/:aID/vote-down', async (req, res) => {
 });
 
 // EDIT A QUESTION
-app.put('/questions/:qID', (req, res) => {
+app.put('/questions/:qID', async (req, res, next) => {
+  const question = records.getQuestion(req.params.qID);
   
-  // attempt to get record
-  // if record isn't returned, return 404
-
-  // check for body before update
-  records.update(req.params.qID, null, req.body, () => {
-    if (!req.body) {
-      res.status(400).json({error: "Expected a question"});
-    } else {
-      records.save(() => res.status(204).end());
+  if(!question){
+    res.status(404).json({error: "Question not found"});
+  } else {
+    try {
+      await records.editQuestion(question, req.body);
+      res.status(204).end();
+    } catch(err){
+      next(err);
     }
-  });
+  }
 });
 
 //EDIT AN ANSWER
 
-app.put('/questions/:qID/answers/:aID', (req, res) => {
-  // attempt to get question 
-  // attempt to get answer
-  // if record isn't returned, return 404
-
-  records.update(req.params.qID, req.params.aID, req.body, () => {
-    if (!req.body) {
-      res.status(400).json({error: "Expected a question"});
-    } else {
-      records.save(() => res.status(204).end());
+app.put('/questions/:qID/answers/:aID', async (req, res, next) => {
+  const answer = records.getAnswer(req.params.qID, req.params.aID);
+  console.log(answer)
+  if(!answer){
+    res.status(404).json({error: "Question or answer not found"});
+  } else {
+    try {
+      await records.editAnswer(answer, req.body.answer);
+      res.status(204).end();
+    } catch(err){
+      next(err);
     }
-  });
+  }
 });
 
-//DELETE A QUESTION 
+// //DELETE A QUESTION 
 
 app.delete('/questions/:qID', (req, res) => {
   // check for question 
+  const question = records.getQuestion(req.params.qID);
 
+  if (!question){
+    res.status(404).json({error: "Question not found"});
+  }
   records.delete(req.params.qID, null, () => {
     records.save(()=> res.status(204).end());
   });
 });
 
-// DELETE AN ANSWER 
-  //check for answer 
+// // DELETE AN ANSWER 
+//   //check for answer 
 
 
-app.delete('/questions/:qID/answers/:aID', (req, res) => {
-  records.delete(req.params.qID, req.params.aID, ()=> {
-    records.save(() => res.status(204).end());
-  });
-});
+// app.delete('/questions/:qID/answers/:aID', (req, res) => {
+//   records.delete(req.params.qID, req.params.aID, ()=> {
+//     records.save(() => res.status(204).end());
+//   });
+// });
 
-// DELETE everything (for testing only)
-app.get('/remove', (req, res) => {
-  data.questions = [];
-  fs.writeFile('data.json', JSON.stringify(data, null, 2));
-  res.end();
-}); 
+// // DELETE everything (for testing only)
+// app.get('/remove', (req, res) => {
+//   data.questions = [];
+//   fs.writeFile('data.json', JSON.stringify(data, null, 2));
+//   res.end();
+// }); 
 
 app.use(function(req, res, next){
   const err = new Error("Not Found");

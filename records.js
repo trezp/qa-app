@@ -55,6 +55,17 @@ async function voteDown(answer){
   await save();
 }
 
+async function editQuestion(question, body){
+  question.question = body.question;
+  await save();
+}
+
+async function editAnswer(answer, body){
+  console.log(body)
+  answer.answer = body;
+  await save();
+}
+
 module.exports = {
   getAll,
   getQuestion, 
@@ -62,7 +73,9 @@ module.exports = {
   createQuestion, 
   createAnswer,
   voteUp,
-  voteDown
+  voteDown,
+  editQuestion,
+  editAnswer
 }
 // function savePromise(){
 //   return new Promise( (resolve,reject) => {

@@ -31,11 +31,6 @@
       ]
     },
     {
-      "question_id": 5875,
-      "question": "99",
-      "answers": []
-    },
-    {
       "question_id": 7336,
       "question": "JavaScript or Python?",
       "answers": [
@@ -58,18 +53,29 @@
     },
     {
       "question_id": 2967,
-      "question": "blaaaah????/",
-      "answers": []
+      "answers": [],
+      "question": "Changing the question again"
     },
     {
       "question_id": 7069,
-      "question": "oijoijoij????/",
+      "question": "What is your favorite color????????????",
       "answers": []
     },
     {
       "question_id": 1192,
-      "question": "Yay async await!",
-      "answers": []
+      "question": "This is question number one",
+      "answers": [
+        {
+          "answer_id": 9922,
+          "answer": "This is answer number one",
+          "votes": 0
+        },
+        {
+          "answer_id": 9441,
+          "votes": 0,
+          "answer": "This is answer number two!!!!!"
+        }
+      ]
     },
     {
       "question_id": 4515,
