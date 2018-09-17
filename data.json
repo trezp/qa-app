@@ -43,69 +43,19 @@
           "answer_id": 7800,
           "answer": "JavaScript!",
           "votes": 0
-        },
-        {
-          "answer_id": 2651,
-          "answer": "Python!",
-          "votes": 0
         }
       ]
-    },
-    {
-      "question_id": 2967,
-      "answers": [],
-      "question": "Changing the question again"
     },
     {
       "question_id": 7069,
-      "question": "What is your favorite color????????????",
-      "answers": []
-    },
-    {
-      "question_id": 1192,
-      "question": "This is question number one",
       "answers": [
         {
-          "answer_id": 9922,
-          "answer": "This is answer number one",
-          "votes": 0
-        },
-        {
-          "answer_id": 9441,
+          "answer_id": 5529,
           "votes": 0,
-          "answer": "This is answer number two!!!!!"
+          "answer": "I don't understand the question"
         }
-      ]
-    },
-    {
-      "question_id": 4515,
-      "question": "OSIFDJSODIFJSDOIFJSDf!",
-      "answers": []
-    },
-    {
-      "question_id": 3322,
-      "question": "This is a question !",
-      "answers": []
-    },
-    {
-      "question_id": 6726,
-      "question": "What is 2+2?",
-      "answers": []
-    },
-    {
-      "question_id": 9392,
-      "answers": []
-    },
-    {
-      "question_id": 283,
-      "question": "I don't know what I'm doing.",
-      "answers": [
-        {
-          "answer_id": 9380,
-          "answer": "You have failed to ask a question.",
-          "votes": 12
-        }
-      ]
+      ],
+      "question": "Why is a raven like a writing desk?"
     }
   ]
 }

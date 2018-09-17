@@ -36,9 +36,6 @@ app.post('/questions', async (req, res, next) => {
 app.post('/questions/:qID/answers', async (req, res, next) => {
   const question = records.getQuestion(req.params.qID);
 
-  // I need to make sure that the question exists AND that they've provided an answer
-  // What should I expect from the client? Just the answer body, or an object?
-  // Should this route just be to the question id, or to qID/answers? 
   if (!question || !req.body.answer){
     next();
   } else {
@@ -103,7 +100,7 @@ app.put('/questions/:qID', async (req, res, next) => {
 
 app.put('/questions/:qID/answers/:aID', async (req, res, next) => {
   const answer = records.getAnswer(req.params.qID, req.params.aID);
-  console.log(answer)
+
   if(!answer){
     res.status(404).json({error: "Question or answer not found"});
   } else {
@@ -116,36 +113,38 @@ app.put('/questions/:qID/answers/:aID', async (req, res, next) => {
   }
 });
 
-// //DELETE A QUESTION 
-
-app.delete('/questions/:qID', (req, res) => {
-  // check for question 
+//DELETE A QUESTION 
+app.delete('/questions/:qID', async (req, res, next) => {
   const question = records.getQuestion(req.params.qID);
 
   if (!question){
     res.status(404).json({error: "Question not found"});
+  } else {
+    try {
+      await records.deleteQuestion(question);
+      res.status(204).end();
+    } catch(err){
+      next(err);
+    }
   }
-  records.delete(req.params.qID, null, () => {
-    records.save(()=> res.status(204).end());
-  });
 });
 
 // // DELETE AN ANSWER 
-//   //check for answer 
+app.delete('/questions/:qID/answers/:aID', async (req, res, next) => {
+  const question = records.getQuestion(req.params.qID);
+  const answer = records.getAnswer(req.params.qID, req.params.aID);
 
-
-// app.delete('/questions/:qID/answers/:aID', (req, res) => {
-//   records.delete(req.params.qID, req.params.aID, ()=> {
-//     records.save(() => res.status(204).end());
-//   });
-// });
-
-// // DELETE everything (for testing only)
-// app.get('/remove', (req, res) => {
-//   data.questions = [];
-//   fs.writeFile('data.json', JSON.stringify(data, null, 2));
-//   res.end();
-// }); 
+  if (!answer){
+    res.status(404).json({error: "Answer not found"});
+  } else {
+    try {
+      await records.deleteAnswer(question, answer);
+      res.status(204).end();
+    } catch(err){
+      next(err);
+    }
+  }
+});
 
 app.use(function(req, res, next){
   const err = new Error("Not Found");
@@ -165,4 +164,12 @@ app.use(function(err, req, res, next){
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
 
 
-
+//Questions for James/To dos: 
+// I need to make sure that the question exists AND that they've provided an answer...
+  // If the keys aren't right when a question or answer is posted/updated, that property
+  // simply disappears 
+// What should I expect from the client? Just the answer body, or an object?
+// Should this route just be to the question id, or to qID/answers? 
+// overall project structure
+// double check best practices to export functions from exports.js
+// comment code, ask James about writing documentation for the module
