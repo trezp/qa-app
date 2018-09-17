@@ -52,27 +52,35 @@ app.post('/questions/:qID/answers', async (req, res, next) => {
 });
 
 // Vote up an answer up
-app.post('/questions/:qID/answers/:aID/vote-up', (req, res) => {
-  records.fetchAnswer(req.params.qID, req.params.aID, (answer) => {
-    if (!answer){
-      res.status(404).json({error: "Answer not found"});
-    } else {
-      answer.votes += 1
-      records.save(() => res.status(204).json({}));
+app.post('/questions/:qID/answers/:aID/vote-up', async (req, res) => {
+  const answer = await records.getAnswer(req.params.qID, req.params.aID);
+
+  if(!answer){
+    res.status(404).json({error: "Answer not found"});
+  } else {
+    try {
+      await records.voteUp(answer);
+      res.status(204).end();
+    } catch(err){
+      next(err);
     }
-  });
+  }
 });
 
 // Vote an answer down 
-app.post('/questions/:qID/answers/:aID/vote-down', (req, res) => {
-  records.fetchAnswer(req.params.qID, req.params.aID, (answer) => {
-    if (!answer){
-      res.status(404).json({error: "Answer not found"});
-    } else {
-      answer.votes -= 1;
-      records.save(() => res.status(204).json({}));
+app.post('/questions/:qID/answers/:aID/vote-down', async (req, res) => {
+  const answer = await records.getAnswer(req.params.qID, req.params.aID);
+
+  if(!answer){
+    res.status(404).json({error: "Answer not found"});
+  } else {
+    try {
+      await records.voteDown(answer);
+      res.status(204).end();
+    } catch(err){
+      next(err);
     }
-  });
+  }
 });
 
 // EDIT A QUESTION

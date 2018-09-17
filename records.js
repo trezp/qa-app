@@ -2,7 +2,6 @@ const fs = require('fs');
 const data = require('./data.json');
 
 //To DO
-//exports.getQuestions
 // reorganize exports
 function generateRandomId(){
   return Math.floor(Math.random() * 10000);
@@ -46,12 +45,24 @@ async function createAnswer(body, qID) {
   return answer;
 }
 
+async function voteUp(answer){
+  answer.votes += 1; 
+  await save();
+}
+
+async function voteDown(answer){
+  answer.votes -= 1; 
+  await save();
+}
+
 module.exports = {
   getAll,
   getQuestion, 
   getAnswer, 
   createQuestion, 
-  createAnswer
+  createAnswer,
+  voteUp,
+  voteDown
 }
 // function savePromise(){
 //   return new Promise( (resolve,reject) => {
