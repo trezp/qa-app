@@ -6,11 +6,20 @@ const app = express();
 app.use(express.json());
 
 // GET all questions
-app.get('/questions', (req, res) => res.json(records.getAll()));
+app.get('/questions', async (req, res, next) => {
+  const allRecords = await records.getAll(); 
+  
+  if(!allRecords){
+    next(); 
+  } else {
+    res.json(allRecords);
+  }
+});
 
 // GET specific question
-app.get('/questions/:qID', (req, res, next) => {
-  const question = records.getQuestion(req.params.qID);
+app.get('/questions/:qID', async (req, res, next) => {
+  const question = await records.getQuestion(req.params.qID);
+  console.log(question)
   if (!question){
     next();
   } else {
@@ -20,6 +29,7 @@ app.get('/questions/:qID', (req, res, next) => {
 
 // POST Create a new question
 app.post('/questions', async (req, res, next) => {
+
   if(!req.body.question){
     res.status(400).json({error: "Expecting a question."});
   } else {
@@ -33,14 +43,14 @@ app.post('/questions', async (req, res, next) => {
 });
 
 // POST a new answer
-app.post('/questions/:qID/answers', async (req, res, next) => {
-  const question = records.getQuestion(req.params.qID);
+app.post('/questions/:qID/', async (req, res, next) => {
 
-  if (!question || !req.body.answer){
-    next();
+  if (!req.body.answer){
+    res.status(400).json({error: "Expecting an answer."});
   } else {
     try {
-      await records.createAnswer(req.body.answer, req.params.qID);
+      const question = await records.getQuestion(req.params.qID);
+      await records.createAnswer(question, req.body.answer);
       res.status(201).json(question);
     } catch(err) {
       next(err);
@@ -50,7 +60,7 @@ app.post('/questions/:qID/answers', async (req, res, next) => {
 
 // Vote up an answer up
 app.post('/questions/:qID/answers/:aID/vote-up', async (req, res, next) => {
-  const answer = records.getAnswer(req.params.qID, req.params.aID);
+  const answer = await records.getAnswer(req.params.qID, req.params.aID);
 
   if(!answer){
     res.status(404).json({error: "Answer not found"});
@@ -66,7 +76,7 @@ app.post('/questions/:qID/answers/:aID/vote-up', async (req, res, next) => {
 
 // Vote an answer down 
 app.post('/questions/:qID/answers/:aID/vote-down', async (req, res, next) => {
-  const answer = records.getAnswer(req.params.qID, req.params.aID);
+  const answer = await records.getAnswer(req.params.qID, req.params.aID);
 
   if(!answer){
     res.status(404).json({error: "Answer not found"});
@@ -82,7 +92,7 @@ app.post('/questions/:qID/answers/:aID/vote-down', async (req, res, next) => {
 
 // EDIT A QUESTION
 app.put('/questions/:qID', async (req, res, next) => {
-  const question = records.getQuestion(req.params.qID);
+  const question = await records.getQuestion(req.params.qID);
   
   if(!question){
     res.status(404).json({error: "Question not found"});
@@ -99,13 +109,13 @@ app.put('/questions/:qID', async (req, res, next) => {
 //EDIT AN ANSWER
 
 app.put('/questions/:qID/answers/:aID', async (req, res, next) => {
-  const answer = records.getAnswer(req.params.qID, req.params.aID);
+  const answer = await records.getAnswer(req.params.qID, req.params.aID);
 
   if(!answer){
-    res.status(404).json({error: "Question or answer not found"});
+    res.status(404).json({error: "Question not found"});
   } else {
     try {
-      await records.editAnswer(answer, req.body.answer);
+      await records.editAnswer(answer, req.body);
       res.status(204).end();
     } catch(err){
       next(err);
@@ -115,7 +125,7 @@ app.put('/questions/:qID/answers/:aID', async (req, res, next) => {
 
 //DELETE A QUESTION 
 app.delete('/questions/:qID', async (req, res, next) => {
-  const question = records.getQuestion(req.params.qID);
+  const question = await records.getQuestion(req.params.qID);
 
   if (!question){
     res.status(404).json({error: "Question not found"});
@@ -131,8 +141,8 @@ app.delete('/questions/:qID', async (req, res, next) => {
 
 // // DELETE AN ANSWER 
 app.delete('/questions/:qID/answers/:aID', async (req, res, next) => {
-  const question = records.getQuestion(req.params.qID);
-  const answer = records.getAnswer(req.params.qID, req.params.aID);
+  const question = await records.getQuestion(req.params.qID);
+  const answer = await records.getAnswer(req.params.qID, req.params.aID);
 
   if (!answer){
     res.status(404).json({error: "Answer not found"});

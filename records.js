@@ -1,26 +1,34 @@
 const fs = require('fs');
 const data = require('./data.json');
 
-//To DO
-// reorganize exports
 function generateRandomId(){
   return Math.floor(Math.random() * 10000);
 }
 
-async function save(cb){
-  fs.writeFile('data.json', JSON.stringify(data, null, 2), cb);
+function save(){
+  return new Promise((resolve, reject) => {
+    fs.writeFile('data.json', JSON.stringify(data, null, 2), (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
 }
 
-function getAll(){
+async function getAll(){
   return data.questions;
 }
 
-function getQuestion(id){
+async function getQuestion(id){
   return data.questions.find(question => question.question_id == id);
 }
 
-function getAnswer(qID, aID){
-  return getQuestion(qID).answers.find(answer => answer.answer_id == aID);
+async function getAnswer(qID, aID){
+  const question = await getQuestion(qID);
+  const answer = question.answers.find(answer => answer.answer_id == aID);
+  return answer;
 }
 
 async function createQuestion(body) {
@@ -34,45 +42,45 @@ async function createQuestion(body) {
   return question; 
 }
 
-async function createAnswer(body, qID) {
+async function createAnswer(record, body) {
   const answer = {
     answer_id: generateRandomId(),
     answer: body, 
     votes: 0
   }
-  getQuestion(qID).answers.push(answer);
-  await save(); 
-  return answer;
+  const question = await getQuestion(record.question_id);
+  question.answers.push(answer);
+  return save(); 
 }
 
 async function voteUp(answer){
   answer.votes += 1; 
-  await save();
+  return save();
 }
 
 async function voteDown(answer){
   answer.votes -= 1; 
-  await save();
+  return save();
 }
 
 async function editQuestion(question, body){
   question.question = body.question;
-  await save();
+  return save();
 }
 
 async function editAnswer(answer, body){
-  answer.answer = body;
-  await save();
+  answer.answer = body.answer;
+  return save();
 }
 
 async function deleteQuestion(result){
   data.questions = data.questions.filter(question => question.question_id != result.question_id);
-  await save();
+  return save();
 }
 
 async function deleteAnswer(question, result){
   question.answers = question.answers.filter(answer => answer.answer_id != result.answer_id);
-  await save();
+  return save();
 }
 
 module.exports = {
