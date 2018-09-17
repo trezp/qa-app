@@ -1,51 +1,53 @@
 const express = require('express');
-const bodyParser = require('body-parser')
-const fs = require('fs');
-
-const data = require('./data.json');
 const records = require('./records');
 
 const app = express();
 
-app.use(bodyParser.json({ type: 'application/json' }));
+app.use(express.json());
 
 // GET all questions
-app.get('/questions', (req, res) => res.json(data.questions));
+app.get('/questions', (req, res) => res.json(records.getAll()));
+
+// GET specific question
+app.get('/questions/:qID', (req, res, next) => {
+  const question = records.getQuestion(req.params.qID);
+  if (!question){
+    next();
+  } else {
+    res.json(question);
+  }
+}); 
 
 // POST Create a new question
-app.post('/questions', (req, res) => {
+app.post('/questions', async (req, res, next) => {
   if(!req.body.question){
-    res.status(404).json({error: "Expecting a question."});
+    res.status(400).json({error: "Expecting a question."});
   } else {
-    records.create(req.body.question, null, (question) => {
-      records.save( ()=> res.status(201).json(question));
-    });
+    try {
+      const question = await records.createQuestion(req.body.question);
+      res.status(201).json(question);
+    } catch(err) {
+      next(err);
+    }
   }
 });
 
-// GET specific question
-app.get('/questions/:qID', (req, res) => {
-  records.fetchQuestion(req.params.qID, (question) => {
-    if (!question){
-      res.status(400).json({
-        error: "Question not found"
-      });
-    } else {
-      res.json(question);
-    }
-  });
-}); 
-
 // POST a new answer
-app.post('/questions/:qID', ( req, res ) => {
-  if (!req.body.answer){
-    res.status(400).json({
-      error: "Oops! You must provide an answer."
-    });
+app.post('/questions/:qID/answers', async (req, res, next) => {
+  const question = await records.getQuestion(req.params.qID);
+
+  // I need to make sure that the question exists AND that they've provided an answer
+  // What should I expect from the client? Just the answer body, or an object?
+  // Should this route just be to the question id, or to qID/answers? 
+  if (!question || !req.body.answer){
+    next();
   } else {
-    records.create(req.body.answer, req.params.qID, (question) => {
-      records.save( () => {res.status(201).json(question)});
-    });
+    try {
+      await records.createAnswer(req.body.answer, req.params.qID);
+      res.status(201).json(question);
+    } catch(err) {
+      next(err);
+    }
   }
 });
 
@@ -53,7 +55,7 @@ app.post('/questions/:qID', ( req, res ) => {
 app.post('/questions/:qID/answers/:aID/vote-up', (req, res) => {
   records.fetchAnswer(req.params.qID, req.params.aID, (answer) => {
     if (!answer){
-      res.status(400).json({error: "Answer not found"});
+      res.status(404).json({error: "Answer not found"});
     } else {
       answer.votes += 1
       records.save(() => res.status(204).json({}));
@@ -65,7 +67,7 @@ app.post('/questions/:qID/answers/:aID/vote-up', (req, res) => {
 app.post('/questions/:qID/answers/:aID/vote-down', (req, res) => {
   records.fetchAnswer(req.params.qID, req.params.aID, (answer) => {
     if (!answer){
-      res.status(400).json({error: "Answer not found"});
+      res.status(404).json({error: "Answer not found"});
     } else {
       answer.votes -= 1;
       records.save(() => res.status(204).json({}));
@@ -75,11 +77,16 @@ app.post('/questions/:qID/answers/:aID/vote-down', (req, res) => {
 
 // EDIT A QUESTION
 app.put('/questions/:qID', (req, res) => {
+  
+  // attempt to get record
+  // if record isn't returned, return 404
+
+  // check for body before update
   records.update(req.params.qID, null, req.body, () => {
     if (!req.body) {
-      res.status(400).json({error: "Question not found"});
+      res.status(400).json({error: "Expected a question"});
     } else {
-      records.save(() => res.status(201).json({}));
+      records.save(() => res.status(204).end());
     }
   });
 });
@@ -87,11 +94,15 @@ app.put('/questions/:qID', (req, res) => {
 //EDIT AN ANSWER
 
 app.put('/questions/:qID/answers/:aID', (req, res) => {
+  // attempt to get question 
+  // attempt to get answer
+  // if record isn't returned, return 404
+
   records.update(req.params.qID, req.params.aID, req.body, () => {
     if (!req.body) {
-      res.status(400).json({error: "Question not found"});
+      res.status(400).json({error: "Expected a question"});
     } else {
-      records.save(() => res.status(201).json({}));
+      records.save(() => res.status(204).end());
     }
   });
 });
@@ -99,15 +110,20 @@ app.put('/questions/:qID/answers/:aID', (req, res) => {
 //DELETE A QUESTION 
 
 app.delete('/questions/:qID', (req, res) => {
+  // check for question 
+
   records.delete(req.params.qID, null, () => {
-    records.save(()=> res.status(201).json({}));
+    records.save(()=> res.status(204).end());
   });
 });
 
 // DELETE AN ANSWER 
+  //check for answer 
+
+
 app.delete('/questions/:qID/answers/:aID', (req, res) => {
   records.delete(req.params.qID, req.params.aID, ()=> {
-    records.save(() => res.status(201).json({}));
+    records.save(() => res.status(204).end());
   });
 });
 
