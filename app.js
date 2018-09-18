@@ -7,23 +7,25 @@ app.use(express.json());
 
 // GET all questions
 app.get('/questions', async (req, res, next) => {
-  const allRecords = await records.getAll(); 
-  
-  if(!allRecords){
-    next(); 
-  } else {
-    res.json(allRecords);
+  try {
+    const allRecords = await records.getAll(); 
+    if(!allRecords){
+      next();
+    } else {
+      res.json(allRecords);
+    }
+  } catch(err) {
+    next(err);
   }
 });
 
 // GET specific question
 app.get('/questions/:qID', async (req, res, next) => {
-  const question = await records.getQuestion(req.params.qID);
-  console.log(question)
-  if (!question){
-    next();
-  } else {
+  try {
+    const question = await records.getQuestion(req.params.qID, next);
     res.json(question);
+  } catch(err) {
+    next(err);
   }
 }); 
 
@@ -43,13 +45,15 @@ app.post('/questions', async (req, res, next) => {
 });
 
 // POST a new answer
-app.post('/questions/:qID/', async (req, res, next) => {
+app.post('/questions/:qID/answers', async (req, res, next) => {
+  const question = await records.getQuestion(req.params.qID);
 
-  if (!req.body.answer){
+  if (!question){
+    next();
+  } else if(!req.body.answer){
     res.status(400).json({error: "Expecting an answer."});
   } else {
     try {
-      const question = await records.getQuestion(req.params.qID);
       await records.createAnswer(question, req.body.answer);
       res.status(201).json(question);
     } catch(err) {
@@ -60,10 +64,11 @@ app.post('/questions/:qID/', async (req, res, next) => {
 
 // Vote up an answer up
 app.post('/questions/:qID/answers/:aID/vote-up', async (req, res, next) => {
-  const answer = await records.getAnswer(req.params.qID, req.params.aID);
+  const question = await records.getQuestion(req.params.qID);
+  const answer = await records.getAnswer(question, req.params.aID);
 
-  if(!answer){
-    res.status(404).json({error: "Answer not found"});
+  if(!question){
+    res.status(404).json({error: "Question not found"});
   } else {
     try {
       await records.voteUp(answer);

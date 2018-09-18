@@ -21,12 +21,11 @@ async function getAll(){
   return data.questions;
 }
 
-async function getQuestion(id){
+async function getQuestion(id, next){
   return data.questions.find(question => question.question_id == id);
 }
 
-async function getAnswer(qID, aID){
-  const question = await getQuestion(qID);
+async function getAnswer(question, aID){
   const answer = question.answers.find(answer => answer.answer_id == aID);
   return answer;
 }
@@ -68,7 +67,13 @@ async function editQuestion(question, body){
   return save();
 }
 
-async function editAnswer(answer, body){
+// async function editAnswer(answer, body){
+//   answer.answer = body.answer;
+//   return save();
+// }
+
+async function editAnswer(question, aID, body){
+  const answer = await getAnswer(question.question_id, aID); 
   answer.answer = body.answer;
   return save();
 }
