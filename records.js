@@ -21,7 +21,8 @@ async function getAll(){
   return data.questions;
 }
 
-async function getQuestion(id, next){
+async function getQuestion(id){
+  throw new Error("bogus error message")
   return data.questions.find(question => question.question_id == id);
 }
 

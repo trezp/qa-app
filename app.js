@@ -19,15 +19,46 @@ app.get('/questions', async (req, res, next) => {
   }
 });
 
+// app.get('/questions', (req, res) => {
+//   const data = [{name: "Treasure"},{name: "James"}];
+//   res.json(data);
+// });
+
+function asyncHandler(middleware){
+  return async (req, res, next)=>{
+    try {
+      await middleware(req,res, next);
+    } catch(err){
+      next(err);
+    }
+  };
+  
+  // return (req, res, next)=>{
+  //   middleware(req,res,next).catch(err => next(err));
+  // };
+}
+
+app.get('/questions/:qID', asyncHandler( async (req,res)=>{
+  const question = await records.getQuestion(req.params.qID);
+  res.json(question);
+})); 
+
+
+
+
+
+
+
+
 // GET specific question
-app.get('/questions/:qID', async (req, res, next) => {
-  try {
-    const question = await records.getQuestion(req.params.qID, next);
-    res.json(question);
-  } catch(err) {
-    next(err);
-  }
-}); 
+// app.get('/questions/:qID', async (req, res, next) => {
+//   try {
+//     const question = await records.getQuestion(req.params.qID, next);
+//     res.json(question);
+//   } catch(err) {
+//     next(err);
+//   }
+// }); 
 
 // POST Create a new question
 app.post('/questions', async (req, res, next) => {
@@ -96,24 +127,33 @@ app.post('/questions/:qID/answers/:aID/vote-down', async (req, res, next) => {
 });
 
 // EDIT A QUESTION
-app.put('/questions/:qID', async (req, res, next) => {
-  const question = await records.getQuestion(req.params.qID);
-  
-  if(!question){
-    res.status(404).json({error: "Question not found"});
-  } else {
-    try {
-      await records.editQuestion(question, req.body);
-      res.status(204).end();
-    } catch(err){
-      next(err);
+async function validateQuestion(req, res, next){
+  try {
+    const question = await records.getQuestion(req.params.qID);
+    if(!question){
+      res.status(404).json({error: "Question not found"});
+    } else {
+      req.question = question;
+      next();
     }
+  } catch(err){
+    next(err);
+  }
+}
+
+
+app.put('/questions/:qID', validateQuestion, async (req, res, next) => {
+  try {
+    await records.editQuestion(req.question, req.body);
+    res.status(204).end();
+  } catch(err){
+    next(err);
   }
 });
 
 //EDIT AN ANSWER
 
-app.put('/questions/:qID/answers/:aID', async (req, res, next) => {
+app.put('/questions/:qID/answers/:aID', validateQuestion, async (req, res, next) => {
   const answer = await records.getAnswer(req.params.qID, req.params.aID);
 
   if(!answer){
@@ -129,31 +169,24 @@ app.put('/questions/:qID/answers/:aID', async (req, res, next) => {
 });
 
 //DELETE A QUESTION 
-app.delete('/questions/:qID', async (req, res, next) => {
-  const question = await records.getQuestion(req.params.qID);
-
-  if (!question){
-    res.status(404).json({error: "Question not found"});
-  } else {
-    try {
-      await records.deleteQuestion(question);
-      res.status(204).end();
-    } catch(err){
-      next(err);
-    }
+app.delete('/questions/:qID', validateQuestion, async (req, res, next) => {
+  try {
+    await records.deleteQuestion(req.question);
+    res.status(204).end();
+  } catch(err){
+    next(err);
   }
 });
 
 // // DELETE AN ANSWER 
-app.delete('/questions/:qID/answers/:aID', async (req, res, next) => {
-  const question = await records.getQuestion(req.params.qID);
+app.delete('/questions/:qID/answers/:aID', validateQuestion, async (req, res, next) => {
   const answer = await records.getAnswer(req.params.qID, req.params.aID);
 
   if (!answer){
     res.status(404).json({error: "Answer not found"});
   } else {
     try {
-      await records.deleteAnswer(question, answer);
+      await records.deleteAnswer(req.question, answer);
       res.status(204).end();
     } catch(err){
       next(err);
