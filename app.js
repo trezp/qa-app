@@ -5,6 +5,30 @@ const app = express();
 
 app.use(express.json());
 
+// HELPER FUNCTIONS
+function asyncHandler(middleware){
+  return async (req, res, next)=>{
+    try {
+      await middleware(req,res, next);
+    } catch(err){
+      next(err);
+    }
+  };
+}
+
+async function validateQuestion(req, res, next){
+  try {
+    const question = await records.getQuestion(req.params.qID);
+    if(!question){
+      res.status(404).json({error: "Question not found"});
+    } else {
+      req.question = question;
+      next();
+    }
+  } catch(err){
+    next(err);
+  }
+}
 // GET all questions
 app.get('/questions', async (req, res, next) => {
   try {
@@ -19,38 +43,8 @@ app.get('/questions', async (req, res, next) => {
   }
 });
 
-// app.get('/questions', (req, res) => {
-//   const data = [{name: "Treasure"},{name: "James"}];
-//   res.json(data);
-// });
+// GET one question 
 
-function asyncHandler(middleware){
-  return async (req, res, next)=>{
-    try {
-      await middleware(req,res, next);
-    } catch(err){
-      next(err);
-    }
-  };
-  
-  // return (req, res, next)=>{
-  //   middleware(req,res,next).catch(err => next(err));
-  // };
-}
-
-app.get('/questions/:qID', asyncHandler( async (req,res)=>{
-  const question = await records.getQuestion(req.params.qID);
-  res.json(question);
-})); 
-
-
-
-
-
-
-
-
-// GET specific question
 // app.get('/questions/:qID', async (req, res, next) => {
 //   try {
 //     const question = await records.getQuestion(req.params.qID, next);
@@ -60,23 +54,25 @@ app.get('/questions/:qID', asyncHandler( async (req,res)=>{
 //   }
 // }); 
 
+app.get('/questions/:qID', asyncHandler( async (req,res)=>{
+  const question = await records.getQuestion(req.params.qID);
+  res.json(question);
+})); 
+
+
 // POST Create a new question
-app.post('/questions', async (req, res, next) => {
+app.post('/questions', asyncHandler(async(req, res, next) => {
 
   if(!req.body.question){
     res.status(400).json({error: "Expecting a question."});
   } else {
-    try {
-      const question = await records.createQuestion(req.body.question);
-      res.status(201).json(question);
-    } catch(err) {
-      next(err);
-    }
+    const question = await records.createQuestion(req.body.question);
+    res.status(201).json(question);
   }
-});
+}));
 
-// POST a new answer
-app.post('/questions/:qID/answers', async (req, res, next) => {
+// // POST a new answer
+app.post('/questions/:qID/answers', asyncHandler(async (req, res, next) => {
   const question = await records.getQuestion(req.params.qID);
 
   if (!question){
@@ -84,115 +80,90 @@ app.post('/questions/:qID/answers', async (req, res, next) => {
   } else if(!req.body.answer){
     res.status(400).json({error: "Expecting an answer."});
   } else {
-    try {
-      await records.createAnswer(question, req.body.answer);
-      res.status(201).json(question);
-    } catch(err) {
-      next(err);
-    }
+    await records.createAnswer(question, req.body.answer);
+    res.status(201).json(question);
   }
-});
+}));
 
-// Vote up an answer up
-app.post('/questions/:qID/answers/:aID/vote-up', async (req, res, next) => {
+// // Vote up an answer up
+app.post('/questions/:qID/answers/:aID/vote-up', asyncHandler(async (req, res, next) => {
   const question = await records.getQuestion(req.params.qID);
   const answer = await records.getAnswer(question, req.params.aID);
 
   if(!question){
     res.status(404).json({error: "Question not found"});
   } else {
-    try {
-      await records.voteUp(answer);
-      res.status(204).end();
-    } catch(err){
-      next(err);
-    }
+    await records.voteUp(answer);
+    res.status(204).end();
   }
-});
+}));
 
-// Vote an answer down 
-app.post('/questions/:qID/answers/:aID/vote-down', async (req, res, next) => {
-  const answer = await records.getAnswer(req.params.qID, req.params.aID);
+// // Vote an answer down 
+app.post('/questions/:qID/answers/:aID/vote-down', asyncHandler(async (req, res, next) => {
+  const question = await records.getQuestion(req.params.qID);
+  const answer = await records.getAnswer(question, req.params.aID);
 
   if(!answer){
     res.status(404).json({error: "Answer not found"});
   } else {
-    try {
-      await records.voteDown(answer);
-      res.status(204).end();
-    } catch(err){
-      next(err);
-    }
-  }
-});
-
-// EDIT A QUESTION
-async function validateQuestion(req, res, next){
-  try {
-    const question = await records.getQuestion(req.params.qID);
-    if(!question){
-      res.status(404).json({error: "Question not found"});
-    } else {
-      req.question = question;
-      next();
-    }
-  } catch(err){
-    next(err);
-  }
-}
-
-
-app.put('/questions/:qID', validateQuestion, async (req, res, next) => {
-  try {
-    await records.editQuestion(req.question, req.body);
+    await records.voteDown(answer);
     res.status(204).end();
-  } catch(err){
-    next(err);
   }
-});
+}));
 
-//EDIT AN ANSWER
+// // EDIT A QUESTION
+app.put('/questions/:qID', validateQuestion, asyncHandler(async (req, res, next) => {
+  await records.editQuestion(req.question, req.body);
+  res.status(204).end();
+}));
 
-app.put('/questions/:qID/answers/:aID', validateQuestion, async (req, res, next) => {
-  const answer = await records.getAnswer(req.params.qID, req.params.aID);
+// //EDIT AN ANSWER
 
-  if(!answer){
-    res.status(404).json({error: "Question not found"});
-  } else {
-    try {
-      await records.editAnswer(answer, req.body);
-      res.status(204).end();
-    } catch(err){
-      next(err);
-    }
-  }
-});
+// app.put('/questions/:qID/answers/:aID', validateQuestion, async (req, res, next) => {
+//   const answer = await records.getAnswer(req.params.qID, req.params.aID);
 
-//DELETE A QUESTION 
-app.delete('/questions/:qID', validateQuestion, async (req, res, next) => {
-  try {
-    await records.deleteQuestion(req.question);
-    res.status(204).end();
-  } catch(err){
-    next(err);
-  }
-});
+//   if(!answer){
+//     res.status(404).json({error: "Question not found"});
+//   } else {
+//     try {
+//       await records.editAnswer(answer, req.body);
+//       res.status(204).end();
+//     } catch(err){
+//       next(err);
+//     }
+//   }
+// });
 
-// // DELETE AN ANSWER 
-app.delete('/questions/:qID/answers/:aID', validateQuestion, async (req, res, next) => {
-  const answer = await records.getAnswer(req.params.qID, req.params.aID);
+app.put('/questions/:qID/answers/:aID', validateQuestion, asyncHandler(async(req,res)=>{
+  await records.editAnswer(req.question, req.params.aID, req.body.answer);
+  res.status(204).end();
+}))
 
-  if (!answer){
-    res.status(404).json({error: "Answer not found"});
-  } else {
-    try {
-      await records.deleteAnswer(req.question, answer);
-      res.status(204).end();
-    } catch(err){
-      next(err);
-    }
-  }
-});
+// //DELETE A QUESTION 
+// app.delete('/questions/:qID', validateQuestion, async (req, res, next) => {
+//   try {
+//     await records.deleteQuestion(req.question);
+//     res.status(204).end();
+//   } catch(err){
+//     next(err);
+//   }
+// });
+
+// // // DELETE AN ANSWER 
+// app.delete('/questions/:qID/answers/:aID', validateQuestion, async (req, res, next) => {
+//   const answer = await records.getAnswer(req.params.qID, req.params.aID);
+
+//   if (!answer){
+//     res.status(404).json({error: "Answer not found"});
+//   } else {
+//     try {
+//       await records.deleteAnswer(req.question, answer);
+//       res.status(204).end();
+//     } catch(err){
+//       next(err);
+//     }
+//   }
+// });
 
 app.use(function(req, res, next){
   const err = new Error("Not Found");
@@ -210,14 +181,3 @@ app.use(function(err, req, res, next){
 });
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
-
-
-//Questions for James/To dos: 
-// I need to make sure that the question exists AND that they've provided an answer...
-  // If the keys aren't right when a question or answer is posted/updated, that property
-  // simply disappears 
-// What should I expect from the client? Just the answer body, or an object?
-// Should this route just be to the question id, or to qID/answers? 
-// overall project structure
-// double check best practices to export functions from exports.js
-// comment code, ask James about writing documentation for the module

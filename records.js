@@ -22,12 +22,13 @@ async function getAll(){
 }
 
 async function getQuestion(id){
-  throw new Error("bogus error message")
+  //throw new Error("bogus error message")
   return data.questions.find(question => question.question_id == id);
 }
 
 async function getAnswer(question, aID){
   const answer = question.answers.find(answer => answer.answer_id == aID);
+  console.log(answer)
   return answer;
 }
 
@@ -74,8 +75,8 @@ async function editQuestion(question, body){
 // }
 
 async function editAnswer(question, aID, body){
-  const answer = await getAnswer(question.question_id, aID); 
-  answer.answer = body.answer;
+  const answer = await getAnswer(question, aID); 
+  answer.answer = body;
   return save();
 }
 
